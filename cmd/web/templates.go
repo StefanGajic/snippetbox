@@ -1,15 +1,17 @@
 package main
 
-import "github.com/snippetbox/pkg/models"
+import (
+	"html/template"
+	"path/filepath"
+	"time"
 
-import "html/template"
-
-import "path/filepath"
-
-import "time"
+	"github.com/snippetbox/pkg/forms"
+	"github.com/snippetbox/pkg/models"
+)
 
 type templateData struct {
 	CurrentYear int
+	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
