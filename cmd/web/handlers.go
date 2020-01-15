@@ -64,19 +64,19 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	form.Required("title", "content", "expires")
 	form.MaxLength("title", 100)
 	form.PermittedValues("expires", "365", "7", "1")
-
+	userID := app.session.GetInt(r, "authenticatedUserID")
 	if !form.Valid() {
 		app.render(w, r, "create.page.tmpl", &templateData{Form: form})
 		return
 	}
 
-	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
+	id, err := app.snippets.Insert(form.Get("title"), form.Get("content"), form.Get("expires"), userID)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	app.session.Put(r, "flash", "Snippet successfully created!")
+	app.session.Put(r, "flash", "Quote successfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
@@ -226,4 +226,28 @@ func (app *application) changePassword(w http.ResponseWriter, r *http.Request) {
 	app.session.Put(r, "flash", "Your password has been updated!")
 	http.Redirect(w, r, "/user/profile", 303)
 
+}
+
+func (app *application) mysnippets(w http.ResponseWriter, r *http.Request) {
+	s, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	userID := app.session.GetInt(r, "authenticatedUserID")
+
+	snippetss := []*models.Snippet{}
+	for i, snippet := range s {
+		app.infoLog.Printf("dodaje %v", 2)
+		if s[i].UserID == userID {
+			snippetss = append(snippetss, snippet)
+		}
+	}
+	for _, s := range snippetss {
+		app.infoLog.Printf("%v", *s)
+	}
+	app.render(w, r, "mysnippets.page.tmpl", &templateData{
+		Snippets: snippetss,
+	})
 }

@@ -1,25 +1,26 @@
 {{template "base" .}}
 
-{{define "title"}}Home{{end}}
+{{define "title"}}Your Quotes{{end}}
 
 {{define "main"}}
-    <h2>Latest Quotes</h2>
+    <h2>Your Quotes</h2>
     {{if .Snippets}}
      <table>
         <tr>
             <th>Title</th>
-            <th>Created At</th>
-            <th>Created By</th>
+            <th>Created</th>
+
         </tr>
         {{range .Snippets}}
         <tr>
             <td><a href='/snippet/{{.ID}}'>{{.Title}}</a></td>
             <td>{{humanDate .Created}}</td>
-            <td>{{.UserID}}</td>
+
         </tr>
-        {{end}}
+        {{end}} 
     </table>
     {{else}}
-        <p>There's nothing to see here... yet!</p>
+        <p>There's nothing to see here... yet!</p>  
     {{end}}
+
 {{end}}

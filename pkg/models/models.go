@@ -17,6 +17,7 @@ type Snippet struct {
 	ID      int
 	Title   string
 	Content string
+	UserID  int
 	Created time.Time
 	Expires time.Time
 }
@@ -28,4 +29,5 @@ type User struct {
 	HashedPassword []byte
 	Created        time.Time
 	Active         bool
+	Snippets       Snippet
 }

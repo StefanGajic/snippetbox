@@ -2,8 +2,10 @@ CREATE TABLE snippets (
     id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
+    user_id INTEGER,
     created DATETIME NOT NULL,
-    expires DATETIME NOT NULL
+    expires DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE INDEX idx_snippets_created ON snippets(created);

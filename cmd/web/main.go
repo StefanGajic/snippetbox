@@ -25,7 +25,7 @@ type application struct {
 	infoLog  *log.Logger
 	session  *sessions.Session
 	snippets interface {
-		Insert(string, string, string) (int, error)
+		Insert(string, string, string, int) (int, error)
 		Get(int) (*models.Snippet, error)
 		Latest() ([]*models.Snippet, error)
 	}
