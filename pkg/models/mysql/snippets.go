@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/snippetbox/pkg/models"
 )
@@ -85,10 +84,7 @@ WHERE id=?`
 	var author string
 	err := row.Scan(&author)
 	if err != nil {
-		fmt.Println("/////")
 		return "", err
 	}
-	fmt.Println("RESULT JE: ", author)
-
 	return author, nil
 }
