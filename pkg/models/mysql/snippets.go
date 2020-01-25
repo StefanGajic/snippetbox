@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/snippetbox/pkg/models"
 )
@@ -74,4 +75,20 @@ WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT 10`
 	}
 	return snippets, nil
 
+}
+
+func (m *SnippetModel) GetAuthor(userID int) (string, error) {
+	stmt := `SELECT name FROM users
+WHERE id=?`
+	row := m.DB.QueryRow(stmt, userID)
+
+	var author string
+	err := row.Scan(&author)
+	if err != nil {
+		fmt.Println("/////")
+		return "", err
+	}
+	fmt.Println("RESULT JE: ", author)
+
+	return author, nil
 }

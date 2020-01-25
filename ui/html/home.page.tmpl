@@ -4,18 +4,18 @@
 
 {{define "main"}}
     <h2>Latest Quotes</h2>
-    {{if .Snippets}}
+    {{if .Temp}}
      <table>
         <tr>
             <th>Title</th>
             <th>Created At</th>
             <th>Created By</th>
         </tr>
-        {{range .Snippets}}
+        {{range .Temp.Data}}
         <tr>
-            <td><a href='/snippet/{{.ID}}'>{{.Title}}</a></td>
-            <td>{{humanDate .Created}}</td>
-            <td>{{.UserID}}</td>
+            <td><a href='/snippet/{{.Snippet.ID}}'>{{.Snippet.Title}}</a></td>
+            <td>{{humanDate .Snippet.Created}}</td>
+            <td>{{.Author}}</td>
         </tr>
         {{end}}
     </table>

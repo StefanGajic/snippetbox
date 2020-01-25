@@ -17,6 +17,7 @@ type templateData struct {
 	Snippet         *models.Snippet
 	Snippets        []*models.Snippet
 	User            *models.User
+	Temp            *DataTemplate
 }
 
 func humanDate(t time.Time) string {

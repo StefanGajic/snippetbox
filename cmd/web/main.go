@@ -28,6 +28,7 @@ type application struct {
 		Insert(string, string, string, int) (int, error)
 		Get(int) (*models.Snippet, error)
 		Latest() ([]*models.Snippet, error)
+		GetAuthor(userID int) (string, error)
 	}
 	templateCache map[string]*template.Template
 	users         interface {

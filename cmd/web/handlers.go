@@ -9,6 +9,15 @@ import (
 	"github.com/snippetbox/pkg/models"
 )
 
+type DataTemplate struct {
+	Data []*Home
+}
+
+type Home struct {
+	Snippet *models.Snippet
+	Author  string
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	s, err := app.snippets.Latest()
@@ -17,10 +26,23 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, "home.page.tmpl", &templateData{
-		Snippets: s,
-	})
-
+	dataTemplate := &DataTemplate{}
+	for _, sd := range s {
+		author, err := app.snippets.GetAuthor(sd.UserID)
+		if err != nil {
+			fmt.Errorf("%s", err)
+		}
+		home := &Home{sd, author}
+		dataTemplate.Data = append(dataTemplate.Data, home)
+		// for _, r := range dataTemplate.Data {
+		// 	fmt.Println(r.Snippet.Title)
+		// 	fmt.Println(r.Author)
+		// }
+	}
+	td := &templateData{
+		Temp: dataTemplate,
+	}
+	app.render(w, r, "home.page.tmpl", td)
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -239,14 +261,11 @@ func (app *application) mysnippets(w http.ResponseWriter, r *http.Request) {
 
 	snippetss := []*models.Snippet{}
 	for i, snippet := range s {
-		app.infoLog.Printf("dodaje %v", 2)
 		if s[i].UserID == userID {
 			snippetss = append(snippetss, snippet)
 		}
 	}
-	for _, s := range snippetss {
-		app.infoLog.Printf("%v", *s)
-	}
+
 	app.render(w, r, "mysnippets.page.tmpl", &templateData{
 		Snippets: snippetss,
 	})
