@@ -9,13 +9,15 @@
         <tr>
             <th>Title</th>
             <th>Created</th>
-
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
         {{range .Snippets}}
         <tr>
             <td><a href='/snippet/{{.ID}}'>{{.Title}}</a></td>
             <td>{{humanDate .Created}}</td>
-
+            <td><a href="/mysnippets/edit/{{.ID}}">Edit Quote</a></td>
+            <td>Delete Quote</td>
         </tr>
         {{end}} 
     </table>

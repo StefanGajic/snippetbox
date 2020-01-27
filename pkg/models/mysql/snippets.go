@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/snippetbox/pkg/models"
 )
@@ -77,8 +78,7 @@ WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT 10`
 }
 
 func (m *SnippetModel) GetAuthor(userID int) (string, error) {
-	stmt := `SELECT name FROM users
-WHERE id=?`
+	stmt := `SELECT name FROM users WHERE id=?`
 	row := m.DB.QueryRow(stmt, userID)
 
 	var author string
@@ -87,4 +87,45 @@ WHERE id=?`
 		return "", err
 	}
 	return author, nil
+}
+
+func (m *SnippetModel) Update(title string, content string, expires string, snippetID int) error {
+	// 	stmt := `UPDATE snippets SET (title, content, expires) =
+	// (?, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY)) WHERE id =?`
+	stmt := `UPDATE snippets SET title = ?, content = ?, expires = DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY) WHERE id = ?`
+
+	result, err := m.DB.Exec(stmt, title, content, expires, snippetID)
+	if err != nil {
+		return err
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if n != 1 {
+		return errors.New("error not equal to 1")
+	}
+
+	return nil
+}
+
+func (m *SnippetModel) Delete(id int) (int64, error) {
+
+	// stmt := `DELETE FROM snippets WHERE id = ?`
+
+	// result, err := m.DB.Exec(stmt)
+	// if err != nil {
+	// 	return err
+	// }
+
+	result, err := m.DB.Exec(`DELETE FROM snippets WHERE id = ?`, id)
+	if err != nil {
+		return 0, err
+	} else {
+		return result.RowsAffected()
+	}
+
+	//return nil
 }

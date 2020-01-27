@@ -29,6 +29,8 @@ type application struct {
 		Get(int) (*models.Snippet, error)
 		Latest() ([]*models.Snippet, error)
 		GetAuthor(userID int) (string, error)
+		Update(string, string, string, int) error
+		Delete(id int) (int64, error)
 	}
 	templateCache map[string]*template.Template
 	users         interface {

@@ -34,10 +34,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		}
 		home := &Home{sd, author}
 		dataTemplate.Data = append(dataTemplate.Data, home)
-		// for _, r := range dataTemplate.Data {
-		// 	fmt.Println(r.Snippet.Title)
-		// 	fmt.Println(r.Author)
-		// }
 	}
 	td := &templateData{
 		Temp: dataTemplate,
@@ -259,14 +255,104 @@ func (app *application) mysnippets(w http.ResponseWriter, r *http.Request) {
 
 	userID := app.session.GetInt(r, "authenticatedUserID")
 
-	snippetss := []*models.Snippet{}
+	snippets := []*models.Snippet{}
 	for i, snippet := range s {
 		if s[i].UserID == userID {
-			snippetss = append(snippetss, snippet)
+			snippets = append(snippets, snippet)
 		}
 	}
 
 	app.render(w, r, "mysnippets.page.tmpl", &templateData{
-		Snippets: snippetss,
+		Snippets: snippets,
 	})
 }
+
+func (app *application) editSnippetForm(w http.ResponseWriter, r *http.Request) {
+
+	app.render(w, r, "edit.page.tmpl", &templateData{
+		Form: forms.New(nil),
+	})
+}
+
+func (app *application) editSnippet(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":id"))
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("title", "content", "expires")
+	form.MaxLength("title", 100)
+	form.PermittedValues("expires", "365", "7", "1")
+
+	userID := app.session.GetInt(r, "authenticatedUserID")
+
+	if !form.Valid() {
+		app.render(w, r, "edit.page.tmpl", &templateData{Form: form})
+		return
+	}
+
+	// idd, err := strconv.Atoi(r.URL.Query().Get(":idd"))
+	// fmt.Println("snippet idd je prvo: ", idd)
+	// if err != nil || idd < 1 {
+	// 	app.notFound(w)
+	// 	return
+	// }
+	// fmt.Println("idd je :", idd)
+
+	// s, err := app.snippets.Get(idd)
+	// fmt.Println("snippet id je posle....: ", s)
+	// if err != nil {
+	// 	if err == models.ErrNoRecord {
+	// 		app.notFound(w)
+	// 	} else {
+	// 		app.serverError(w, err)
+	// 	}
+	// 	return
+	// }
+
+	//fmt.Println("snippet s je posle....: ", s)
+	fmt.Println("snippet id je pre: ", id)
+	err = app.snippets.Update(form.Get("title"), form.Get("content"), form.Get("expires"), id)
+	fmt.Println("snippet id je: ", id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	//fmt.Println("snippet id je sada opet: ", id)
+	fmt.Println("USER je: ", userID)
+
+	s, err := app.snippets.Latest()
+	fmt.Println("id je: ", s)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	snippets := []*models.Snippet{}
+	for i, snippet := range s {
+		if s[i].UserID == userID {
+			snippets = append(snippets, snippet)
+		}
+		fmt.Println("snipets je: ", snippets)
+	}
+
+	app.session.Put(r, "flash", "Quote successfully edited!")
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
+
+	app.render(w, r, "edit.page.tmpl", &templateData{
+		Snippets: snippets,
+	})
+
+}
+
+// func (app *application) deleteSnippet(w http.ResponseWriter, r *http.Request) {
+
+// 	userID := app.session.GetInt(r, "authenticatedUserID")
+
+//  }
